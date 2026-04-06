@@ -3,8 +3,6 @@ Flask-SQLAlchemy>=3.1.1
 Flask-Mail>=0.10.0
 Flask-Dance>=7.0.0
 Werkzeug>=3.0.0
-scikit-learn
-pandas
 python-whois>=0.8.0
 psycopg2-binary>=2.9.9
 cryptography

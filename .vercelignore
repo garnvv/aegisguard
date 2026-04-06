@@ -1,0 +1,41 @@
+# Python virtual environments (huge — never needed by Vercel)
+.venv/
+venv/
+venv_mac/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+
+# Local development database
+instance/
+*.db
+*.sqlite3
+
+# Environment secrets
+.env
+.env.local
+
+# Frontend dev artifacts (Vercel uses the pre-built dist/)
+frontend/node_modules/
+frontend/.env.local
+
+# macOS metadata
+.DS_Store
+
+# Old unused scripts
+fix_jinja.py
+refactor_chart.py
+refactor_ui.py
+rewrite_auth.py
+rewrite_dash.py
+migrate_db.py
+test_db.py
+test_ml.py
+
+# pkl model files (not used — pure heuristic engine)
+phishing_rf_model.pkl
+scaler.pkl
