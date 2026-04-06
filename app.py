@@ -44,11 +44,19 @@ if 'sqlite' in _db_url:
 # ─────────────────────────────────────────────
 #  Flask-Mail Configuration (SMTP for OTP)
 # ─────────────────────────────────────────────
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', '')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', '')
+_mail_port = int(os.getenv('MAIL_PORT', 465))
+_use_ssl   = os.getenv('MAIL_USE_SSL', 'True').lower() == 'true'
+_use_tls   = os.getenv('MAIL_USE_TLS', 'False').lower() == 'true'
+# Port 465 uses SSL; port 587 uses STARTTLS. Auto-detect if both not set explicitly.
+if _mail_port == 587 and not _use_tls:
+    _use_tls = True
+    _use_ssl = False
+app.config['MAIL_SERVER']         = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT']           = _mail_port
+app.config['MAIL_USE_TLS']        = _use_tls
+app.config['MAIL_USE_SSL']        = _use_ssl
+app.config['MAIL_USERNAME']       = os.getenv('MAIL_USERNAME', '')
+app.config['MAIL_PASSWORD']       = os.getenv('MAIL_PASSWORD', '')
 app.config['MAIL_DEFAULT_SENDER'] = ('AegisGuard.AI', os.getenv('MAIL_USERNAME', ''))
 
 db.init_app(app)
