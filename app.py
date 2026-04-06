@@ -30,8 +30,16 @@ if os.getenv('FLASK_ENV') == 'development' or os.getenv('OAUTHLIB_INSECURE_TRANS
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Database Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+_db_url = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+# Heroku/Neon sometimes provides postgres:// — SQLAlchemy needs postgresql://
+if _db_url.startswith('postgres://'):
+    _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# SQLite needs check_same_thread=False in multi-threaded environments
+if 'sqlite' in _db_url:
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': {'check_same_thread': False}}
+
 
 # ─────────────────────────────────────────────
 #  Flask-Mail Configuration (SMTP for OTP)
