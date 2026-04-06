@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-screen w-full flex bg-cyber-900 overflow-hidden relative items-center justify-center">
+
+    <!-- Global Particles -->
+    <div id="particles-js" class="absolute inset-0 z-0 pointer-events-none opacity-40"></div>
+
+    <!-- Ambient Orbs -->
+    <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-600/5 rounded-full blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[130px] pointer-events-none"></div>
+
+    <!-- Card -->
+    <div class="w-full max-w-md px-6 relative z-20">
+        <div class="bg-slate-900/70 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_8px_48px_0_rgba(0,0,0,0.5)] p-10 relative overflow-hidden">
+
+            <!-- Top neon bar -->
+            <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-400 via-purple-500 to-indigo-500 shadow-[0_0_20px_rgba(0,245,255,0.8)]"></div>
+
+            <!-- Shield Icon Header -->
+            <div class="flex flex-col items-center mb-8">
+                <!-- Animated shield -->
+                <div class="relative mb-5">
+                    <div id="shield-ring" class="w-20 h-20 rounded-full border-2 border-cyan-400/40 flex items-center justify-center" style="box-shadow: 0 0 30px rgba(0,245,255,0.2);">
+                        <div class="w-16 h-16 rounded-full border border-cyan-400/20 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- Pulse rings -->
+                    <div class="absolute inset-0 rounded-full border border-cyan-400/20 animate-ping" style="animation-duration:2s;"></div>
+                </div>
+
+                <h2 class="text-2xl font-extrabold text-white tracking-tight">Identity Verification</h2>
+                <p class="text-slate-400 text-xs font-mono tracking-widest uppercase mt-1">Two-Factor Authentication</p>
+                <p class="text-slate-400 text-sm mt-4 text-center leading-relaxed">
+                    Access code sent to<br>
+                    <span class="text-cyan-400 font-mono font-bold">{{ masked_email }}</span>
+                </p>
+            </div>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="mb-4 px-4 py-3 rounded-xl text-sm font-mono border
+                        {% if category == 'error' %}bg-red-900/30 border-red-500/30 text-red-300
+                        {% elif category == 'success' %}bg-emerald-900/30 border-emerald-500/30 text-emerald-300
+                        {% else %}bg-cyan-900/30 border-cyan-500/30 text-cyan-300{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- OTP Form -->
+            <form id="otp-form" action="{{ url_for('verify_otp') }}" method="POST">
+                <input type="hidden" name="otp_code" id="otp_code_hidden">
+
+                <!-- 6 digit boxes -->
+                <div class="flex justify-center gap-3 mb-8" id="otp-boxes">
+                    {% for i in range(1, 7) %}
+                    <input
+                        type="text"
+                        id="d{{ i }}"
+                        name="d{{ i }}"
+                        maxlength="1"
+                        inputmode="numeric"
+                        pattern="[0-9]"
+                        autocomplete="one-time-code"
+                        class="otp-digit w-12 h-14 text-center text-2xl font-bold text-white bg-slate-950/60 border-2 border-white/10 rounded-xl outline-none transition-all duration-200 caret-transparent
+                               focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(0,245,255,0.25)] focus:bg-slate-900/80"
+                    >
+                    {% endfor %}
+                </div>
+
+                <!-- Timer -->
+                <div class="flex items-center justify-center gap-2 mb-6">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-xs font-mono text-slate-400">Code expires in <span id="timer" class="text-amber-400 font-bold">10:00</span></span>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" id="verify-btn"
+                    class="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-white uppercase tracking-widest bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 shadow-[0_5px_20px_rgba(0,245,255,0.25)] hover:shadow-[0_5px_30px_rgba(108,99,255,0.5)] hover:-translate-y-1 focus:outline-none transition-all duration-300 group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+                    <span class="z-10 flex items-center gap-2">
+                        Verify &amp; Authenticate
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+
+            <!-- Resend section -->
+            <div class="mt-6 text-center">
+                <p class="text-slate-500 text-xs font-mono mb-2">Didn't receive the code?</p>
+                <button id="resend-btn"
+                    class="text-xs font-bold text-purple-400 hover:text-cyan-300 uppercase tracking-widest transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    onclick="resendOTP(this)">
+                    Resend Code
+                </button>
+                <div id="resend-status" class="text-xs font-mono mt-2 hidden"></div>
+            </div>
+
+            <!-- Back link -->
+            <div class="mt-6 border-t border-white/10 pt-5 text-center">
+                <a href="{{ url_for('login') }}" class="text-[10px] font-mono text-slate-500 uppercase tracking-widest hover:text-slate-300 transition-colors">
+                    ← Cancel &amp; Return to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Particles.js -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+if (document.getElementById('particles-js')) {
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 50, density: { enable: true, value_area: 1200 } },
+            color: { value: '#00F5FF' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.2, random: true, anim: { enable: true, speed: 1, opacity_min: 0.05, sync: false } },
+            size: { value: 2, random: true },
+            line_linked: { enable: true, distance: 150, color: '#6C63FF', opacity: 0.15, width: 1 },
+            move: { enable: true, speed: 0.6, direction: 'none', random: true, out_mode: 'out' }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: { onhover: { enable: true, mode: 'grab' }, resize: true },
+            modes: { grab: { distance: 140, line_linked: { opacity: 0.6 } } }
+        },
+        retina_detect: true
+    });
+}
+
+// ── OTP Digit Box UX ─────────────────────────────────
+const digits = document.querySelectorAll('.otp-digit');
+const hiddenInput = document.getElementById('otp_code_hidden');
+
+digits.forEach((box, idx) => {
+    box.addEventListener('keydown', (e) => {
+        // Allow only digits, Backspace, Tab, Arrow keys
+        if (!/^\d$/.test(e.key) && !['Backspace','Tab','ArrowLeft','ArrowRight','Delete'].includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'Backspace') {
+            box.value = '';
+            syncHidden();
+            if (idx > 0) digits[idx - 1].focus();
+            return;
+        }
+        if (e.key === 'ArrowLeft' && idx > 0) { digits[idx-1].focus(); return; }
+        if (e.key === 'ArrowRight' && idx < digits.length - 1) { digits[idx+1].focus(); return; }
+    });
+
+    box.addEventListener('input', () => {
+        // Keep only last digit typed
+        box.value = box.value.replace(/[^0-9]/g, '').slice(-1);
+        syncHidden();
+        if (box.value && idx < digits.length - 1) {
+            digits[idx + 1].focus();
+        }
+        // Auto-submit when all 6 filled
+        if ([...digits].every(d => d.value.length === 1)) {
+            highlightBoxes('filled');
+            setTimeout(() => document.getElementById('otp-form').submit(), 300);
+        }
+    });
+
+    box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+        [...pasted.slice(0, 6)].forEach((ch, i) => {
+            if (digits[i]) digits[i].value = ch;
+        });
+        syncHidden();
+        const nextEmpty = [...digits].findIndex(d => !d.value);
+        (digits[nextEmpty] || digits[digits.length - 1]).focus();
+        if ([...digits].every(d => d.value.length === 1)) {
+            highlightBoxes('filled');
+            setTimeout(() => document.getElementById('otp-form').submit(), 300);
+        }
+    });
+
+    box.addEventListener('focus', () => {
+        box.classList.add('border-cyan-400');
+        box.select();
+    });
+    box.addEventListener('blur', () => {
+        if (!box.value) box.classList.remove('border-cyan-400');
+    });
+});
+
+function syncHidden() {
+    hiddenInput.value = [...digits].map(d => d.value).join('');
+}
+
+function highlightBoxes(state) {
+    digits.forEach(d => {
+        d.classList.remove('border-cyan-400','border-emerald-400','border-red-400');
+        if (state === 'filled') d.classList.add('border-emerald-400');
+    });
+}
+
+// Pre-focus first empty box on load
+(digits[0] || digits[0]).focus();
+
+// ── Countdown Timer (10 minutes = 600 seconds) ───────
+let remaining = 600;
+const timerEl = document.getElementById('timer');
+const resendBtn = document.getElementById('resend-btn');
+
+function updateTimer() {
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+
+    if (remaining <= 60) {
+        timerEl.classList.remove('text-amber-400');
+        timerEl.classList.add('text-red-400');
+    }
+    if (remaining <= 0) {
+        timerEl.textContent = 'EXPIRED';
+        timerEl.classList.add('animate-pulse');
+        document.getElementById('verify-btn').disabled = true;
+        clearInterval(timerInterval);
+    }
+    remaining--;
+}
+
+const timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+// ── Resend OTP ───────────────────────────────────────
+function resendOTP(btn) {
+    btn.disabled = true;
+    const statusEl = document.getElementById('resend-status');
+    statusEl.classList.remove('hidden');
+    statusEl.textContent = 'Sending...';
+    statusEl.className = 'text-xs font-mono mt-2 text-slate-400';
+
+    fetch("{{ url_for('resend_otp') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            statusEl.textContent = '✓ ' + data.message;
+            statusEl.className = 'text-xs font-mono mt-2 text-emerald-400';
+            // Reset timer
+            remaining = 600;
+            timerEl.classList.remove('text-red-400','animate-pulse');
+            timerEl.classList.add('text-amber-400');
+            document.getElementById('verify-btn').disabled = false;
+            // Clear digit boxes
+            digits.forEach(d => { d.value = ''; d.classList.remove('border-cyan-400','border-emerald-400'); });
+            syncHidden();
+            digits[0].focus();
+            // Re-enable resend after 30s
+            setTimeout(() => {
+                btn.disabled = false;
+                statusEl.classList.add('hidden');
+            }, 30000);
+        } else {
+            statusEl.textContent = '✗ ' + (data.error || 'Failed to resend.');
+            statusEl.className = 'text-xs font-mono mt-2 text-red-400';
+            btn.disabled = false;
+        }
+    })
+    .catch(() => {
+        statusEl.textContent = '✗ Network error. Try again.';
+        statusEl.className = 'text-xs font-mono mt-2 text-red-400';
+        btn.disabled = false;
+    });
+}
+
+// ── Shield pulse animation ───────────────────────────
+const ring = document.getElementById('shield-ring');
+if (ring) {
+    setInterval(() => {
+        ring.style.boxShadow = '0 0 40px rgba(0,245,255,0.4)';
+        setTimeout(() => { ring.style.boxShadow = '0 0 20px rgba(0,245,255,0.15)'; }, 800);
+    }, 2000);
+}
+</script>
+{% endblock %}

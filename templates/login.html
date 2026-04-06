@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-screen w-full flex bg-cyber-900 overflow-hidden relative">
+
+    <!-- Global Particles -->
+    <div id="particles-js" class="absolute inset-0 z-0 pointer-events-none opacity-40"></div>
+
+    <!-- Left Pattern/Illustration Side -->
+    <div class="hidden lg:flex lg:w-1/2 relative bg-cyber-900 overflow-hidden items-center justify-center">
+        <!-- Overlay Gradients -->
+        <div class="absolute inset-0 bg-gradient-to-br from-cyan-900/30 to-purple-900/40 mix-blend-overlay z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-cyber-900 via-transparent to-transparent z-10"></div>
+        
+        <!-- Generated Image -->
+        <img src="{{ url_for('static', filename='cyber_auth_bg.png') }}" class="absolute inset-0 w-full h-full object-cover z-0 filter brightness-90 contrast-125" alt="Cyber Security Core">
+        
+        <!-- Big Text Widget -->
+        <div class="absolute bottom-16 left-16 z-20 backdrop-blur-md bg-black/40 p-8 rounded-3xl border border-white/10 shadow-[0_15px_50px_rgba(0,0,0,0.5)]">
+            <h1 class="text-5xl font-extrabold text-white mb-4 drop-shadow-[0_0_20px_rgba(0,245,255,0.6)]">AegisGuard<span class="text-cyan-400">.AI</span></h1>
+            <p class="text-slate-300 font-mono text-medium uppercase tracking-widest max-w-lg leading-relaxed border-l-2 border-purple-500 pl-4">Next-Generation Machine Learning Threat Detection & Global Enterprise Telemetry Matrix.</p>
+        </div>
+    </div>
+
+    <!-- Right Form Side -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative overflow-hidden backdrop-blur-md bg-cyber-800/20 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] z-20">
+        
+        <!-- Glowing Ambient Orbs behind form -->
+        <div class="absolute top-1/4 -left-32 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div class="w-full max-w-md relative z-30">
+            <!-- Glass Form Container -->
+            <div class="bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-10 relative overflow-hidden group">
+                <!-- Top neon line highlight -->
+                <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-400 via-purple-500 to-indigo-500 shadow-[0_0_20px_rgba(0,245,255,0.8)]"></div>
+                
+                <div class="mb-10 text-center">
+                    <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tight flex items-center justify-center gap-3">
+                        <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                        {% if type == 'login' %}System Access{% else %}Initialize Node{% endif %}
+                    </h2>
+                    <p class="text-slate-400 text-sm font-mono tracking-widest uppercase">{% if type == 'login' %}Awaiting Secure Handshake{% else %}Establish Cryptographic Profile{% endif %}</p>
+                </div>
+
+                <form action="{{ url_for('login' if type == 'login' else 'register') }}" method="POST" class="space-y-6">
+                    {% if type == 'register' %}
+                    <div class="relative group">
+                        <input type="text" name="name" id="name" required class="peer w-full bg-slate-950/60 text-white px-5 pt-7 pb-3 border-b-2 border-white/10 rounded-xl focus:border-cyan-400 outline-none transition-all placeholder-transparent focus:shadow-[0_0_20px_rgba(0,245,255,0.1)] shadow-inner" placeholder="Operator Designation" autocomplete="off">
+                        <label for="name" class="absolute left-5 top-2 text-[10px] text-cyan-400 font-bold uppercase tracking-widest transition-all peer-placeholder-shown:text-xs peer-placeholder-shown:text-slate-500 peer-placeholder-shown:top-5 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-cyan-400 cursor-text">Operator Name</label>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="relative group">
+                        <input type="email" name="email" id="email" required class="peer w-full bg-slate-950/60 text-white px-5 pt-7 pb-3 border-b-2 border-white/10 rounded-xl focus:border-cyan-400 outline-none transition-all placeholder-transparent focus:shadow-[0_0_20px_rgba(0,245,255,0.1)] shadow-inner" placeholder="Uplink Address" autocomplete="off">
+                        <label for="email" class="absolute left-5 top-2 text-[10px] text-cyan-400 font-bold uppercase tracking-widest transition-all peer-placeholder-shown:text-xs peer-placeholder-shown:text-slate-500 peer-placeholder-shown:top-5 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-cyan-400 cursor-text">Uplink Address (Email)</label>
+                    </div>
+
+                    <div class="relative group">
+                        <input type="password" name="password" id="password" required class="peer w-full bg-slate-950/60 text-white px-5 pt-7 pb-3 border-b-2 border-white/10 rounded-xl focus:border-cyan-400 outline-none transition-all placeholder-transparent focus:shadow-[0_0_20px_rgba(0,245,255,0.1)] shadow-inner tracking-widest font-mono text-lg" placeholder="••••••••">
+                        <label for="password" class="absolute left-5 top-2 text-[10px] text-cyan-400 font-bold uppercase tracking-widest transition-all peer-placeholder-shown:text-xs peer-placeholder-shown:text-slate-500 peer-placeholder-shown:top-5 peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-cyan-400 cursor-text">Access Key (Password)</label>
+                    </div>
+
+                    {% if type == 'login' %}
+                    <div class="flex items-center justify-between mt-4">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-slate-600 bg-slate-800 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 transition-colors">
+                            <label for="remember-me" class="ml-2 block text-xs text-slate-300">Remember session state</label>
+                        </div>
+                        <div class="text-xs">
+                            <a href="#" class="font-bold text-purple-400 hover:text-cyan-300 transition-colors">Reset Key?</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-white uppercase tracking-widest bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 shadow-[0_5px_20px_rgba(0,245,255,0.3)] hover:shadow-[0_5px_30px_rgba(108,99,255,0.5)] border border-transparent hover:-translate-y-1 focus:outline-none transition-all duration-300 mt-8 group relative overflow-hidden">
+                        <span class="z-10 bg-transparent flex items-center gap-2">
+                           {% if type == 'login' %}Execute Handshake{% else %}Generate Root Access{% endif %}
+                           <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </span>
+                        <div class="absolute inset-0 w-full h-full bg-white/10 opacity-0 group-active:opacity-100 transition-opacity"></div>
+                    </button>
+                    
+                    <!-- Form Separator -->
+                    <div class="mt-8 relative flex items-center justify-center">
+                        <div class="absolute w-full border-t border-white/10"></div>
+                        <span class="bg-slate-900/60 backdrop-blur-md px-3 text-[9px] uppercase tracking-widest font-bold text-slate-500 relative z-10">Or continue with</span>
+                    </div>
+
+                    <!-- Social Login Buttons -->
+                    <div class="mt-6 grid grid-cols-2 gap-4">
+                        <a href="{{ url_for('google.login') }}" class="w-full inline-flex justify-center items-center py-3 px-4 rounded-xl bg-slate-800/60 border border-white/5 shadow-inner text-xs font-bold text-slate-300 hover:bg-slate-700/80 hover:border-white/20 hover:shadow-[0_0_15px_rgba(66,133,244,0.15)] transition-all hover:-translate-y-0.5 group gap-2 cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Google
+                        </a>
+                        <a href="{{ url_for('github.login') }}" class="w-full inline-flex justify-center items-center py-3 px-4 rounded-xl bg-slate-800/60 border border-white/5 shadow-inner text-xs font-bold text-slate-300 hover:bg-slate-700/80 hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.07)] transition-all hover:-translate-y-0.5 group gap-2 cursor-pointer">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path>
+                            </svg>
+                            GitHub
+                        </a>
+                    </div>
+
+                </form>
+
+                <div class="mt-8 text-center text-[11px] font-mono border-t border-white/10 pt-6">
+                    {% if type == 'login' %}
+                        <span class="text-slate-500 uppercase tracking-widest block mb-1">No Profile Core Assigned?</span> 
+                        <a href="{{ url_for('register') }}" class="font-bold text-cyan-400 hover:text-purple-400 tracking-widest hover:underline transition-colors uppercase">Request Authorization</a>
+                    {% else %}
+                        <span class="text-slate-500 uppercase tracking-widest block mb-1">Already Established Core?</span> 
+                        <a href="{{ url_for('login') }}" class="font-bold text-cyan-400 hover:text-purple-400 tracking-widest hover:underline transition-colors uppercase">Return to Handshake</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Particle Animation Layer -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    if (document.getElementById('particles-js')) {
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 70, density: { enable: true, value_area: 1200 } },
+                color: { value: '#00F5FF' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+                size: { value: 3, random: true, anim: { enable: false, speed: 40, size_min: 0.1, sync: false } },
+                line_linked: { enable: true, distance: 150, color: '#6C63FF', opacity: 0.2, width: 1 },
+                move: { enable: true, speed: 0.8, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
+            },
+            interactivity: { detect_on: 'canvas', events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' }, resize: true }, modes: { grab: { distance: 140, line_linked: { opacity: 0.8 } }, push: { particles_nb: 4 } } },
+            retina_detect: true
+        });
+    }
+</script>
+{% endblock %}

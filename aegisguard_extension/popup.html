@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AegisGuard.AI Scanner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #080d18;
+      --bg2:      #0d1526;
+      --bg3:      #111d35;
+      --border:   rgba(255,255,255,0.08);
+      --cyan:     #00f5ff;
+      --purple:   #a78bfa;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --green:    #10b981;
+      --yellow:   #f59e0b;
+      --red:      #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      width: 400px;
+      min-height: 200px;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #0a1428 0%, #0d1a30 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), #6366f1);
+      box-shadow: 0 0 12px rgba(0,245,255,0.8);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, rgba(0,245,255,0.2), rgba(167,139,250,0.2));
+      border: 1px solid rgba(0,245,255,0.4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0,245,255,0.3);
+    }
+    .logo-icon svg { width: 18px; height: 18px; color: var(--cyan); }
+    .logo-text { font-size: 15px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--cyan); }
+    .logo-sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .version-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(0,245,255,0.1);
+      border: 1px solid rgba(0,245,255,0.3);
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+    }
+
+    /* ── Body ── */
+    .body { padding: 16px; }
+
+    /* Current tab strip */
+    .tab-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+    }
+    .tab-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px rgba(0,245,255,0.8);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .tab-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+    .tab-url { font-size: 10px; font-family: monospace; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Input area */
+    .input-group { margin-bottom: 12px; }
+    .input-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .url-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 12px;
+      font-family: monospace;
+      padding: 10px 14px;
+      outline: none;
+      resize: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.5;
+    }
+    .url-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,245,255,0.1), 0 0 15px rgba(0,245,255,0.15);
+    }
+    .url-input::placeholder { color: var(--muted); font-family: monospace; }
+
+    /* Scan button */
+    .scan-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0891b2, #7c3aed);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,245,255,0.2);
+    }
+    .scan-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,245,255,0.35);
+      background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+    }
+    .scan-btn:active:not(:disabled) { transform: translateY(0); }
+    .scan-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error box */
+    .error-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: #fca5a5;
+    }
+    .error-box svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* Server toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 12px;
+    }
+    .toggle-label { font-size: 11px; font-weight: 600; color: var(--text); }
+    .toggle-sub { font-size: 9px; color: var(--muted); margin-top: 1px; }
+
+    .toggle-switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #1e293b;
+      border-radius: 20px;
+      transition: 0.3s;
+      border: 1px solid var(--border);
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      height: 14px; width: 14px;
+      left: 2px; bottom: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    input:checked + .slider { background: linear-gradient(135deg, #0891b2, #7c3aed); border-color: transparent; }
+    input:checked + .slider::before { transform: translateX(18px); }
+
+    /* ── Results ── */
+    .result-section {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    .result-section.hidden { display: none; }
+
+    /* Scanned URL bar */
+    .scanned-bar {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+    }
+    .scanned-bar-label { font-size: 8px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
+    #scanned-url { font-size: 10px; font-family: monospace; color: #94a3b8; word-break: break-all; }
+    #use-mode { font-size: 8px; color: var(--muted); margin-top: 3px; font-style: italic; }
+
+    /* Main result card */
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Gauge */
+    .gauge {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 6px solid #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.5s;
+    }
+    .gauge-inner { text-align: center; }
+    #gauge-text { font-size: 20px; font-weight: 900; color: #10b981; display: block; transition: color 0.5s; }
+    .gauge-label { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Verdict */
+    .verdict-info { flex: 1; }
+    #verdict-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+      margin-bottom: 6px;
+    }
+    #verdict-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .detail-row { margin-bottom: 4px; }
+    .detail-key { font-size: 8px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .detail-val { font-size: 10px; color: var(--text); margin-top: 1px; }
+
+    /* Reasons */
+    .reasons-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .reasons-title {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .reasons-list {
+      list-style: none;
+      max-height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .reasons-list::-webkit-scrollbar { width: 4px; }
+    .reasons-list::-webkit-scrollbar-track { background: transparent; }
+    .reasons-list::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.2); border-radius: 4px; }
+
+    .reason-item {
+      font-size: 10px;
+      color: #94a3b8;
+      font-family: monospace;
+      padding: 5px 8px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.03);
+      line-height: 1.4;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 10px 18px 14px;
+      font-size: 9px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .footer span { color: var(--cyan); }
+
+    .hidden { display: none !important; }
+
+    /* ── Scanning Overlay ── */
+    .scan-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 13, 24, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      gap: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .scan-overlay.hidden { display: none !important; }
+
+    /* Outer ring + inner rings */
+    .scan-rings {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scan-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid transparent;
+    }
+    .scan-ring-1 {
+      width: 100px; height: 100px;
+      border-top-color: #00f5ff;
+      border-right-color: rgba(0,245,255,0.3);
+      animation: spin 1s linear infinite;
+    }
+    .scan-ring-2 {
+      width: 76px; height: 76px;
+      border-top-color: #a78bfa;
+      border-left-color: rgba(167,139,250,0.3);
+      animation: spin 0.7s linear infinite reverse;
+    }
+    .scan-ring-3 {
+      width: 52px; height: 52px;
+      border-top-color: #10b981;
+      border-right-color: rgba(16,185,129,0.3);
+      animation: spin 1.4s linear infinite;
+    }
+    .scan-shield {
+      width: 28px; height: 28px;
+      color: #00f5ff;
+      animation: shield-pulse 1s ease-in-out infinite alternate;
+    }
+    @keyframes shield-pulse {
+      from { opacity: 0.5; transform: scale(0.9); }
+      to   { opacity: 1;   transform: scale(1.1); }
+    }
+    .scan-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #00f5ff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: label-blink 1.2s ease-in-out infinite alternate;
+    }
+    .scan-sublabel {
+      font-size: 9px;
+      color: #64748b;
+      letter-spacing: 1px;
+    }
+    @keyframes label-blink {
+      from { opacity: 0.6; }
+      to   { opacity: 1; }
+    }
+    /* Progress dots */
+    .scan-dots { display: flex; gap: 5px; }
+    .scan-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #00f5ff;
+      animation: dot-wave 1.2s ease-in-out infinite;
+    }
+    .scan-dot:nth-child(2) { animation-delay: 0.2s; background: #a78bfa; }
+    .scan-dot:nth-child(3) { animation-delay: 0.4s; background: #10b981; }
+    @keyframes dot-wave {
+      0%, 100% { transform: translateY(0); opacity: 0.4; }
+      50%       { transform: translateY(-5px); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Scanning Overlay (shown during scan) ─────────────────── -->
+  <div id="scan-overlay" class="scan-overlay hidden">
+    <div class="scan-rings">
+      <div class="scan-ring scan-ring-1"></div>
+      <div class="scan-ring scan-ring-2"></div>
+      <div class="scan-ring scan-ring-3"></div>
+      <svg class="scan-shield" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <div class="scan-label">Analyzing URL</div>
+    <div class="scan-dots">
+      <div class="scan-dot"></div>
+      <div class="scan-dot"></div>
+      <div class="scan-dot"></div>
+    </div>
+    <div class="scan-sublabel" id="overlay-status">Running security checks...</div>
+  </div>
+
+  <!-- ── Header ──────────────────────────────────────────────────── -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#00f5ff">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">AegisGuard<span>.AI</span></div>
+        <div class="logo-sub">OAuth Phishing Scanner</div>
+      </div>
+    </div>
+    <div class="version-badge">v1.0</div>
+  </div>
+
+  <!-- ── Body ────────────────────────────────────────────────────── -->
+  <div class="body">
+
+    <!-- Auto-Scan Status Bar -->
+    <div id="auto-scan-status" style="
+      font-size: 10px;
+      font-weight: 600;
+      color: #00f5ff;
+      background: rgba(0,245,255,0.06);
+      border: 1px solid rgba(0,245,255,0.15);
+      border-radius: 8px;
+      padding: 7px 12px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    ">⚡ Initializing scan...</div>
+    <div class="tab-strip">
+      <div class="tab-dot"></div>
+      <span class="tab-label">Active Tab</span>
+      <span class="tab-url" id="current-tab-url">Loading...</span>
+    </div>
+
+    <!-- URL Input -->
+    <div class="input-group">
+      <label class="input-label" for="url-input">Authorization URL to Scan</label>
+      <textarea
+        id="url-input"
+        class="url-input"
+        rows="3"
+        placeholder="https://accounts.google.com/o/oauth2/auth?client_id=...&redirect_uri=...&scope=..."
+      ></textarea>
+    </div>
+
+    <!-- Scan Button -->
+    <button id="scan-btn" class="scan-btn">
+      <span id="btn-text" style="display:flex;align-items:center;gap:8px;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Re-Scan Page
+      </span>
+      <span id="btn-spinner" class="hidden" style="display:flex;align-items:center;gap:8px;">
+        <div class="spinner"></div>
+        Analyzing...
+      </span>
+    </button>
+
+    <!-- Error Box -->
+    <div id="error-box" class="error-box hidden">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#ef4444">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <span id="error-msg"></span>
+    </div>
+
+    <!-- Server Mode Toggle -->
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Use AegisGuard Server</div>
+        <div class="toggle-sub">Uses AegisGuard backend at 127.0.0.1:5001 — run <code>python3 app.py</code> first</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="use-server">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- ── Results ────────────────────────────────────────────────── -->
+    <div id="result-section" class="result-section hidden">
+
+      <!-- Scanned URL -->
+      <div class="scanned-bar">
+        <div class="scanned-bar-label">Scanned Target</div>
+        <div id="scanned-url">—</div>
+        <div id="use-mode">—</div>
+      </div>
+
+      <!-- Main Result Card -->
+      <div class="result-card">
+        <!-- Gauge -->
+        <div class="gauge" id="gauge">
+          <div class="gauge-inner">
+            <span id="gauge-text">0%</span>
+            <span class="gauge-label">Risk</span>
+          </div>
+        </div>
+
+        <!-- Verdict Info -->
+        <div class="verdict-info">
+          <div id="verdict-badge">—</div>
+          <div id="verdict-label">—</div>
+          <div class="detail-row">
+            <div class="detail-key">Attack Vector</div>
+            <div class="detail-val" id="attack-type">—</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-key">Data at Risk</div>
+            <div class="detail-val" id="data-risk">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reasons -->
+      <div class="reasons-card">
+        <div class="reasons-title">
+          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Detection Log
+        </div>
+        <ul class="reasons-list" id="reasons-list"></ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <div class="footer">
+    <span>AegisGuard.AI</span> — Next-Gen OAuth Threat Intelligence
+  </div>
+
+  <!-- Scripts — scanner.js must load before popup.js -->
+  <script src="scanner.js"></script>
+  <script src="popup.js"></script>
+
+</body>
+</html>

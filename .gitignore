@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.so
+
+# Virtual environments
+.venv/
+venv/
+venv_mac/
+ENV/
+env/
+
+# Database (local SQLite — do NOT commit production data)
+instance/
+*.db
+*.sqlite3
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.local
+.env.production.local
+
+# macOS
+.DS_Store
+
+# Vercel
+.vercel
+
+# Node / Frontend
+frontend/node_modules/
+frontend/.env.local
+# NOTE: frontend/dist IS committed so Vercel can serve it as static
+# Remove the next line if you want Vercel to build it automatically
+# frontend/dist/
+
+# Scratch / refactor scripts (not needed in production)
+fix_jinja.py
+refactor_chart.py
+refactor_ui.py
+rewrite_auth.py
+rewrite_dash.py
+migrate_db.py
+test_db.py
+test_ml.py

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "AegisGuard.AI — OAuth Phishing Scanner",
+  "version": "1.0.0",
+  "description": "Real-time OAuth phishing link detection powered by AegisGuard.AI multi-layer ML heuristic engine. Scan any URL instantly from your browser.",
+  "permissions": ["activeTab", "storage", "tabs"],
+  "host_permissions": ["http://127.0.0.1:5001/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AegisGuard.AI Scanner",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
