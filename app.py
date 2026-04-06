@@ -555,6 +555,73 @@ def admin():
 
 
 
+
+
+# ─────────────────────────────────────────────
+#  Contact Form  →  sends email to owner
+# ─────────────────────────────────────────────
+OWNER_EMAIL = 'gauravnpatil2005@gmail.com'
+
+@app.route('/api/contact', methods=['POST', 'OPTIONS'])
+def contact():
+    if request.method == 'OPTIONS':
+        resp = jsonify({'ok': True})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return resp, 200
+
+    data    = request.get_json(silent=True) or {}
+    name    = data.get('name', '').strip()[:100]
+    email   = data.get('email', '').strip()[:200]
+    message = data.get('message', '').strip()[:2000]
+
+    if not name or not email or not message:
+        return jsonify({'success': False, 'error': 'All fields are required.'}), 400
+
+    mail_configured = bool(
+        app.config.get('MAIL_USERNAME') and
+        app.config['MAIL_USERNAME'] not in ('', 'YOUR_GMAIL_ADDRESS@gmail.com')
+    )
+
+    if not mail_configured:
+        app.logger.warning('Contact form: MAIL not configured — skipping send.')
+        return jsonify({'success': True, 'message': 'Message received.'})
+
+    try:
+        notify = Message(
+            subject=f'AegisGuard Contact: {name}',
+            recipients=[OWNER_EMAIL],
+            reply_to=email
+        )
+        notify.html = f"""
+        <div style="font-family:Courier New,monospace;background:#0a0f1e;color:#e2e8f0;
+                    padding:36px;border-radius:12px;max-width:540px;margin:auto;border:1px solid #1e3a5f;">
+          <h2 style="color:#00f5ff;letter-spacing:3px">AegisGuard — New Contact Message</h2>
+          <p><strong>From:</strong> {name} [{email}]</p>
+          <hr style="border:none;border-top:1px solid #1e3a5f;margin:16px 0">
+          <p style="white-space:pre-wrap;color:#94a3b8">{message}</p>
+        </div>"""
+        mail.send(notify)
+
+        reply = Message(
+            subject='AegisGuard — We got your message!',
+            recipients=[email]
+        )
+        reply.html = f"""
+        <div style="font-family:Courier New,monospace;background:#0a0f1e;color:#e2e8f0;
+                    padding:36px;border-radius:12px;max-width:540px;margin:auto;border:1px solid #1e3a5f;">
+          <h2 style="color:#00f5ff;letter-spacing:3px">AegisGuard.AI</h2>
+          <p style="color:#94a3b8">Hi <strong style="color:#e2e8f0">{name}</strong>,<br><br>
+          Thanks for reaching out! We received your message and will reply within
+          <strong style="color:#00f5ff">24 hours</strong>.<br><br>— The AegisGuard Team</p>
+        </div>"""
+        mail.send(reply)
+
+        return jsonify({'success': True, 'message': 'Your message has been sent!'})
+    except Exception as e:
+        app.logger.error(f'Contact mail error: {e}')
+        return jsonify({'success': False, 'error': 'Failed to send. Please try again.'}), 500
+
 # ─────────────────────────────────────────────
 #  Chrome Extension API Endpoint
 # ─────────────────────────────────────────────

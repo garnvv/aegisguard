@@ -77,15 +77,32 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [formStatus, setFormStatus] = useState(null); // null | 'sending' | 'sent'
+  const [formStatus, setFormStatus] = useState(null); // null | 'sending' | 'sent' | 'error'
+  const [formError, setFormError] = useState('');
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setFormStatus('sending');
-    await new Promise(r => setTimeout(r, 1200));
-    setFormStatus('sent');
-    setFormData({ name: '', email: '', message: '' });
-    setTimeout(() => setFormStatus(null), 5000);
+    setFormError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setFormStatus('sent');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setFormStatus(null), 6000);
+      } else {
+        setFormError(json.error || 'Something went wrong. Please try again.');
+        setFormStatus(null);
+      }
+    } catch {
+      setFormError('Network error. Please check your connection and try again.');
+      setFormStatus(null);
+    }
   };
 
   return (
@@ -388,6 +405,15 @@ export default function HomePage() {
                       </>
                     )}
                   </motion.button>
+                  {formError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-sm text-rose-400 text-center pt-1"
+                    >
+                      ⚠️ {formError}
+                    </motion.p>
+                  )}
                 </form>
               )}
             </motion.div>
